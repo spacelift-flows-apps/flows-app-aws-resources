@@ -96,9 +96,13 @@ function mapCloudFormationType(
         description: cfProperty.description || "",
       };
     }
-    if (cfProperty.items?.type === "string") return ["string"];
-    if (cfProperty.items?.type === "number") return ["number"];
-    // For other complex array types, return the full schema
+    // Use shorthand only for simple arrays without enum constraints
+    if (!cfProperty.items?.enum) {
+      if (cfProperty.items?.type === "string") return ["string"];
+      if (cfProperty.items?.type === "number") return ["number"];
+    }
+
+    // For arrays with constraints or complex types, return full schema
     return {
       type: "array",
       items: cfProperty.items || {},
